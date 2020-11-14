@@ -1,0 +1,22 @@
+resource "null_resource" "tiller" {
+  provisioner "local-exec" {
+    environment = {
+      KUBECONFIG = "${path.root}/.kube/config"
+    }
+
+    command = "kubectl apply -f ${path.module}/templates/helm-rbac.yaml"
+  }
+
+  provisioner "local-exec" {
+    environment = {
+      KUBECONFIG = "${path.root}/.kube/config"
+    }
+
+    command = "helm init --service-account tiller"
+  }
+
+  depends_on = [
+    aws_eks_cluster.eks_cluster,
+    local_file.kubecfg,
+  ]
+}
